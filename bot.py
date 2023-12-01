@@ -1,6 +1,7 @@
 import discord
 import responses
 import os
+from dotenv import load_dotenv
 
 async def send_message(message):
     try:
@@ -10,7 +11,7 @@ async def send_message(message):
         print(e)
 
 def run_discord_bot():
-    print(os.getenv('TOKEN'))
+    load_dotenv()
     TOKEN = os.getenv('TOKEN')
     client = discord.Client(intents=discord.Intents.default())
 
