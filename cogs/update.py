@@ -19,16 +19,15 @@ class update(commands.Cog):
 
     @tasks.loop(time=TIME)
     async def my_task(self):
-        with open(f'./data/{bot.ctx.guild.id}.json', 'r') as f:
+        with open(f'./data/{bot.ctx.guild.id}.json', 'rw') as f:
             data = json.load(f)
-        if data['daily_quotes'] == None:
-             return
-        temp_history = []
-        async for message in data['quotes_chat'].history(limit=None):
-                if re.match(bot.QUOTE_FORMAT, message.content) and message.author != bot.user:
-                    temp_history.append(message)
-        data['history'] = temp_history
-        with open(f'./data/{bot.ctx.guild.id}.json', 'w') as f:
+            if data['daily_quotes'] == None:
+                 return
+            temp_history = []
+            async for message in data['quotes_chat'].history(limit=None):
+                    if re.match(bot.QUOTE_FORMAT, message.content) and message.author != bot.user:
+                        temp_history.append(message)
+            data['history'] = temp_history
             json.dump(data, f)
 
 async def setup(bot):

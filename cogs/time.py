@@ -21,18 +21,18 @@ class time(commands.Cog):
 
     @tasks.loop(time=TIME)
     async def my_task(self):
-        with open(f'./data/{bot.ctx.guild.id}.json', 'r') as f:
+        with open(f'./data/{bot.ctx.guild.id}.json', 'rw') as f:
             data = json.load(f)
-        if data['daily_quotes'] == None:
-            print("no daily quotes")
-            return
-        else:
-            random_quote = random.choice(data['history'])
-            speaker = random_quote.mentions[0].display_name
-            author = random_quote.author
-            quote = re.match(bot.QUOTE_ONLY, random_quote.content)
-            qdate = random_quote.created_at.strftime("%d/%m/%Y")
-            await bot.DAILY_QUOTES.send(f"QUOTE OF THE DAY {date.today()}:\n@{speaker} said: {quote[0]} on {qdate}.")
+            if data['daily_quotes'] == None:
+                print("no daily quotes")
+                return
+            else:
+                random_quote = random.choice(data['history'])
+                speaker = random_quote.mentions[0].display_name
+                author = random_quote.author
+                quote = re.match(bot.QUOTE_ONLY, random_quote.content)
+                qdate = random_quote.created_at.strftime("%d/%m/%Y")
+                await bot.DAILY_QUOTES.send(f"QUOTE OF THE DAY {date.today()}:\n@{speaker} said: {quote[0]} on {qdate}.")
 
 
 async def setup(bot):
