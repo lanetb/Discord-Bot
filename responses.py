@@ -22,7 +22,7 @@ class Quotes_Chat:
 quotes_chat = Quotes_Chat(None, None)
 
 def handle_message(message) -> str:
-    p_message = message.lower()
+    p_message = str(message).lower()
 
     if p_message == "hi":
         return "Hello, how are you?"
@@ -34,13 +34,13 @@ def handle_message(message) -> str:
             try:
                 list_q = quotes_chat.get_quotes_chat().history()
                 return get_random_quote(list_q)
-            except quotes_chat.get_quotes_chat.history().Forbidden:
+            except discord.Forbidden:
                 return "I don't have permissions for that chat."
-            except quotes_chat.get_quotes_chat.history().HTTPException:
+            except discord.HTTPException:
                 return "Could not get the chat history."
             
     if p_message == "setquoteschat" or p_message == "sqc":
-        quotes_chat.set_quotes_chat(discord.TextChannel)
+        quotes_chat.set_quotes_chat(discord.channel)
         return "This chat has been set as the quotes chat."
     
     if p_message == "$setquotesoftheday" or p_message == "$sqotd":

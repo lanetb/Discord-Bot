@@ -2,38 +2,99 @@ import discord
 import responses
 import os
 from dotenv import load_dotenv
+from discord.ext import commands, tasks
+import re
+import random
+import datetime
+import json
 
-async def send_message(message):
-    try:
-        response = responses.handle_message(message)
-        await message.channel.send(response)
-    except Exception as e:
-        print(e)
+bot = commands.Bot(command_prefix='!q', intents=discord.Intents.all())
 
-def run_discord_bot():
-    load_dotenv()
-    TOKEN = os.getenv('TOKEN')
-    client = discord.Client(intents=discord.Intents.default())
+QUOTE_FORMAT = re.compile('".*".*')
+QUOTE_ONLY = re.compile('".*"')
 
-    @client.event
-    async def on_ready():
-        print(f'{client.user} has connected to Discord!')
+async def load():
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py'):
+            await bot.load_extension(f'cogs.{filename[:-3]}')
 
-    @client.event
-    async def on_message(message):
-        if message.author == client.user:
-            return
+async def create_guild_files():
+    print("create guild files")
+    async for guild in bot.fetch_guilds(limit=None):
+        print(guild + "1" + guild.id)
+        if not os.path.isfile(f'./data/{guild.id}.json'):
+            data = {
+                'quotes_chat': None,
+                'daily_quotes': None,
+                'history': []
+            }
+            with open(f'./data/{guild.id}.json', 'w') as f:
+                json.dump(data, f)
+
+async def run_discord_bot():
+    async with bot:
+        load_dotenv()
+        await create_guild_files()
+        await load()
+        await bot.start(os.getenv('TOKEN'))
+
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
+
+@bot.command()
+async def ping(ctx):
+    await ctx.send('pong')
+
+@bot.command()
+async def set(ctx):
+    with open(f'./data/{ctx.guild.id}.json', 'r') as f:
+        data = json.load(f)
+    data['quotes_chat'] = ctx.channel.id
+    temp_history = []
+    if data['history'] == []:
+            async for message in ctx.channel.history(limit=None):
+                if re.match(QUOTE_FORMAT, message.content) and message.author != bot.user:
+                    temp_history.append(message)
+    await ctx.send(f"#{data['quotes_chat']} has been set as the quotes chat.")
+    data['history'] = temp_history
+    with open(f'./data/{ctx.guild.id}.json', 'w') as f:
+        json.dump(data, f)
+
+@bot.command()
+async def rand(ctx):
+    with open(f'./data/{ctx.guild.id}.json', 'r') as f:
+        data = json.load(f)
+    if data['quotes_chat'] == None:
+        await ctx.send('No quotes chat has been set.')
+    else:
+        temp_history = []
+        if data['history'] == []:
+            async for message in ctx.channel.history(limit=None):
+                if re.match(QUOTE_FORMAT, message.content) and message.author != bot.user:
+                    temp_history.append(message)
+        await ctx.send(f"#{data['quotes_chat']} has been set as the quotes chat.")
+        data['history'] = temp_history
+        random_quote = random.choice(data['history'])
+        speaker = random_quote.mentions[0].display_name
+        author = random_quote.author
+        quote = re.match(QUOTE_ONLY, random_quote.content)
+        date = random_quote.created_at.strftime("%d/%m/%Y")
+
+        await ctx.send(f'@{speaker} said: {quote[0]} on {date}.')
+        with open(f'./data/{ctx.guild.id}.json', 'w') as f:
+            json.dump(data, f)
+
+@bot.command()
+async def daily(ctx):
+    with open(f'./data/{ctx.guild.id}.json', 'r') as f:
+        data = json.load(f)
+    data['daily_quotes'] = ctx.channel.id
+    await ctx.send(f"#{data['data_quotes']} has been set as the daily quotes chat.")
+
+    with open(f'./data/{ctx.guild.id}.json', 'w') as f:
+        json.dump(data, f)
+
+
         
-        username = str(message.author)
-        user_message = str(message.content)
-        print(user_message)
-        channel = str(message.channel)
-
-        print(f"{username} said: '{user_message}' ({channel})")
-
-        if user_message[0] == "!":
-            user_message = user_message[1:]
-            await send_message(message)
-
-    client.run(TOKEN)
-    
+          
