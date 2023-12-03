@@ -63,11 +63,11 @@ async def rand(ctx):
                 if re.match(QUOTE_FORMAT, message.content) and message.author != bot.user:
                     data['history'].append(message)
         random_quote = random.choice(data['history'])
-        speaker = random_quote.mentions[0].display_name
+        speaker = random_quote.mentions[0].mention
         author = random_quote.author
         quote = re.match(QUOTE_ONLY, random_quote.content)
         date = random_quote.created_at.strftime("%d/%m/%Y")
-    await ctx.send(f'@{speaker} said: {quote[0]} on {date}.')
+    await ctx.send(f'{speaker} said: {quote[0]} on {date}.')
     DICT[ctx.guild.id] = data
 
 
