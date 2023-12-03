@@ -2,12 +2,12 @@ import datetime
 from discord.ext import commands, tasks
 import discord
 import bot
+from bot import DICT
 import re
-import json
 
 UTC = datetime.timezone.utc
 
-TIME = datetime.time(hour=5, minute=0, tzinfo=UTC) 
+TIME = datetime.time(hour=20, minute=19, tzinfo=UTC) 
 
 class update(commands.Cog):
     def __init__(self, bot):
@@ -19,8 +19,9 @@ class update(commands.Cog):
 
     @tasks.loop(time=TIME)
     async def my_task(self):
-        with open(f'./data/{bot.ctx.guild.id}.json', 'rw') as f:
-            data = json.load(f)
+        async for guild in self.bot.fetch_guilds(limit=None):
+            print("update")
+            data = DICT[guild.id]
             if data['daily_quotes'] == None:
                  return
             temp_history = []
@@ -28,7 +29,7 @@ class update(commands.Cog):
                     if re.match(bot.QUOTE_FORMAT, message.content) and message.author != bot.user:
                         temp_history.append(message)
             data['history'] = temp_history
-            json.dump(data, f)
+            DICT[guild.id] = data      
 
 async def setup(bot):
     await bot.add_cog(update(bot))
