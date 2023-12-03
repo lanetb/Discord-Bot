@@ -35,21 +35,24 @@ async def ping(ctx):
 
 @bot.command()
 async def set(ctx):
-    if ctx.guild.id not in DICT:
-        data = {
-            'quotes_chat': None,
-            'daily_quotes': None,
-            'history': []
-        }
+    if ctx.message.author.guild_permissions.administrator:
+        if ctx.guild.id not in DICT:
+            data = {
+                'quotes_chat': None,
+                'daily_quotes': None,
+                'history': []
+            }
+            DICT[ctx.guild.id] = data
+        data = DICT[ctx.guild.id]
+        data['quotes_chat'] = ctx.channel
+        if data['history'] == []:
+            async for message in data['quotes_chat'].history(limit=None):
+                if re.match(QUOTE_FORMAT, message.content) and message.author != bot.user:
+                    data['history'].append(message)
+        await ctx.send(f"#{data['quotes_chat']} has been set as the quotes chat.")
         DICT[ctx.guild.id] = data
-    data = DICT[ctx.guild.id]
-    data['quotes_chat'] = ctx.channel
-    if data['history'] == []:
-        async for message in data['quotes_chat'].history(limit=None):
-            if re.match(QUOTE_FORMAT, message.content) and message.author != bot.user:
-                data['history'].append(message)
-    await ctx.send(f"#{data['quotes_chat']} has been set as the quotes chat.")
-    DICT[ctx.guild.id] = data
+    else:
+        await ctx.send("You don't have permission to do that.")
 
 
 @bot.command()
@@ -73,21 +76,21 @@ async def rand(ctx):
 
 @bot.command()
 async def day(ctx):
-    if ctx.guild.id not in DICT:
-        data = {
-            'quotes_chat': None,
-            'daily_quotes': None,
-            'history': []
-        }
+    if ctx.message.author.guild_permissions.administrator:
+        if ctx.guild.id not in DICT:
+            data = {
+                'quotes_chat': None,
+                'daily_quotes': None,
+                'history': []
+            }
+            DICT[ctx.guild.id] = data
+        data = DICT[ctx.guild.id]
+        data['daily_quotes'] = ctx.channel
+        await ctx.send(f"#{data['daily_quotes']} has been set as the daily quotes chat.")
         DICT[ctx.guild.id] = data
-    data = DICT[ctx.guild.id]
-    data['daily_quotes'] = ctx.channel
-    await ctx.send(f"#{data['daily_quotes']} has been set as the daily quotes chat.")
-    DICT[ctx.guild.id] = data
+    else:
+        await ctx.send("You don't have permission to do that.")
 
-@bot.command()
-async def getContext(ctx):
-    return ctx
 
 
         
