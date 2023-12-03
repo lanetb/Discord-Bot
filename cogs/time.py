@@ -10,7 +10,7 @@ import json
 
 UTC = datetime.timezone.utc
 
-TIME = datetime.time(hour=1, minute=5, tzinfo=UTC) 
+TIME = datetime.time(hour=0, minute=0, tzinfo=UTC) 
 class time(commands.Cog):
     def __init__(self, bot):
         self.bot = bot

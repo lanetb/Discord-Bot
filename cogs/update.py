@@ -7,7 +7,7 @@ import re
 
 UTC = datetime.timezone.utc
 
-TIME = datetime.time(hour=20, minute=19, tzinfo=UTC) 
+TIME = datetime.time(hour=5, minute=0, tzinfo=UTC) 
 
 class update(commands.Cog):
     def __init__(self, bot):
