@@ -38,7 +38,7 @@ class time(commands.Cog):
                 author = random_quote.author
                 quote = re.match(bot.QUOTE_ONLY, random_quote.content)
                 qdate = random_quote.created_at.strftime("%d/%m/%Y")
-                await data['daily_quotes'].send(f"QUOTE OF THE DAY {date.today()}:\n@{speaker} said: {quote[0]} on {qdate}.\n{link}")
+                await data['daily_quotes'].send(f"QUOTE OF THE DAY {date.today()}:\n{speaker} said: {quote[0]} on {qdate}.\nGoto the Quote: {link}")
                 DICT[guild.id] = data
 
 async def setup(bot):

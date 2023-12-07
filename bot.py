@@ -71,7 +71,7 @@ async def rand(ctx):
         author = random_quote.author
         quote = re.match(QUOTE_ONLY, random_quote.content)
         date = random_quote.created_at.strftime("%d/%m/%Y")
-    await ctx.send(f'{speaker} said: {quote[0]} on {date}.\n{link}')
+    await ctx.send(f'{speaker} said: {quote[0]} on {date}.\nGoto the Quote: {link}')
     DICT[ctx.guild.id] = data
 
 
